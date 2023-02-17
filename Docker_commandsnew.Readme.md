@@ -1,27 +1,16 @@
-[README.md Syntax Guide](https://www.markdownguide.org/basic-syntax/)
-
-    ps aux | grep docker 
-```
-The command ps aux | grep docker is a Unix/Linux command
+● ps aux | grep docker : The command ps aux | grep docker is a Unix/Linux command
 that lists all running processes and filters the results to show only those related to
 Docker. The output of the command will show information about the processes that are
 running on the system and include the user that is running the process, the amount of
 CPU and memory resources it is using, and the command that started the process.  
-```
 
-    docker-compose up
-```
-It runs all required dependencies and softwares in an isolated
+● docker-compose up : It runs all required dependencies and softwares in an isolated
 environment called Container. So we need not to install dependencies again and again
 when we want to set up that application in a new machine.  
-```
 
-    docker-compose down – rmi all 
-```
-we can remove the application and all its
+● docker-compose down – rmi all : we can remove the application and all its
 dependencies by using this command. So we will remove only specific dependencies
 required only for that application.It avoids messing up with the other applications.  
-```
 
 ● docker version : it displays version of installed docker version in local host  
 
