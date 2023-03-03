@@ -1,20 +1,31 @@
-const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const mysql = require('mysql');
+//importing the required dependency
+const express = require('express'); //for building the server and to handle the http request
+const session = require('express-session'); //for managing user sessions
+const bodyParser = require('body-parser');  //for parsing HTTP request bodies
+const cookieParser = require('cookie-parser'); //for parsing cookies
+const mysql = require('mysql'); //for interacting with the MySQL database
 const app = express();
 const dbConfig = require('./dbConfig');
 
-// const connection = mysql.createPool({
-// 	connectionLimit: 10,
-// 	host: process.env.MYSQL_HOST || 'localhost',
-// 	user: process.env.MYSQL_USER || 'root',
-// 	password: process.env.MYSQL_PASSWORD || 'password',
-// 	database: process.env.MYSQL_DATABASE || 'test'
-// });
-
+//The application starts by creating a connection pool to the MySQL database defined in "dbConfig.js"
+//Configuring with MySQL database
 const connection = mysql.createPool(dbConfig);
+
+// Test the connection pool
+
+connection.getConnection((err, connection) => {
+  if (err) {
+
+    console.error('Error connecting to database: ', err);
+    return;
+  }
+
+  console.log('Connected to database successfully.');
+
+  connection.release(); // method is called to release the connection back to the pool
+});
+
+module.exports = connection;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 //Configuring express server
@@ -27,10 +38,12 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+//returns a login form HTML file
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/login.html');
 });
 
+//accepts username and password and authenticates the user against the "loginusers" table in the database. If the authentication succeeds, it sets the "loggedin" session variable and redirects to the "/home" endpoint; otherwise, it returns an error message.
 app.post('/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -48,7 +61,7 @@ app.post('/login', (req, res) => {
         req.session.loggedin = true;
         req.session.username = username;
         res.redirect('/home');
-       // res.json(result1);
+        res.json();
       } else {
         res.send('Incorrect username or password');
       }           
@@ -60,7 +73,7 @@ app.post('/login', (req, res) => {
   }
 });
 
-
+// if the user is authenticated (i.e., if the "loggedin" session variable is set), it returns a welcome message and a button to add new users. Otherwise, it redirects to the "/" endpoint.
 app.get('/home', (req, res) => {
   if (req.session.loggedin) {
    // res.send('Welcome back, ' + req.session.username + '! <a href="/add">Add Users</a>');
@@ -76,7 +89,7 @@ app.get('/home', (req, res) => {
     res.redirect('/');
   }
 });
-
+// returns an HTML form to add new users.
 app.get('/add', (req, res) => {
   res.sendFile(__dirname + '/add.html');
 });
@@ -86,17 +99,18 @@ app.get('/success', (req, res) => {
   res.sendFile(__dirname + '/success.html');
 });
 
+//accepts username and password and inserts a new row into the "loginusers" table if the user does not already exist. If the user already exists, it returns an error message. If the insertion succeeds, it redirects to the "/success" endpoint.
 app.post('/register', (req, res) => {
   if (req.session.loggedin) {
-    const username1 = req.body.username1;
-    const password1 = req.body.password1;
+    const username = req.body.username;
+    const password = req.body.password;
 
     console.log("Printing username and password");
-    console.log(username1);
-    console.log(password1);
+    console.log(username);
+    console.log(password);
     // Check if the user already exists
     const checkQuery = 'SELECT * FROM loginusers WHERE uid1 = ? AND pwd = ?';
-    connection.query(checkQuery, [username1,password1], (err, results) => {
+    connection.query(checkQuery, [username,password], (err, results) => {
       if (err) throw err;
 
       // If the query returns any results, the user already exists
@@ -107,14 +121,25 @@ app.post('/register', (req, res) => {
 
       // If the user does not exist, insert the new user into the table
       const insertQuery = 'INSERT INTO loginusers (uid1, pwd) VALUES (?, ?)';
-      connection.query(insertQuery, [username1, password1], (err, result) => {
+      connection.query(insertQuery, [username, password], (err, result) => {
         if (err) throw err;
 
-        console.log(`Inserted new user: ${username1}`);
-        res.redirect('/success');
-       console.log(result);
+        console.log(`Inserted new user: ${username}`);
+
+        res.redirect(302, '/success');
+        console.log(result);
         connection.end();
         res.end();
+        // This line will print the URL in postman body
+        const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+        res.json();
+        // res.redirect('/success');
+        // console.log(result);
+        // //This line will print the URL in postman body
+        // const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+        // res.json({ url });
+        // //connection.end();
+        // res.end();
       });
     });
   } else {
@@ -122,42 +147,46 @@ app.post('/register', (req, res) => {
   }
 });
 
+//accepts username and new password and updates the corresponding row in the "loginusers" table. 
+//If the update succeeds, it returns a success message.
+app.put('/users', (req, res) => {
+  const { username, password } = req.body;
+  const query = 'UPDATE loginusers SET pwd = ? WHERE uid1 = ?';
+  connection.query(query, [password, username], (err, results, fields) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update user' });
+    } else {
 
-// app.post('/register', (req, res) => {
-//   if(req.session.loggedin){
-//   const username1 = req.body.username1;
-//   const password1 = req.body.password1;
-//  // const { username1, password1 } = req.body;
-//   console.log("Printing username and password");
-//   console.log(username1);
-//   console.log(password1);
-//   const query = 'INSERT INTO loginusers (uid1, pwd) VALUES (?, ?)';
-//   connection.query(query, [username1, password1], (err, result) => {
-//     if (err) throw err;
-//       console.log(`Inserted new user: ${username1}`);
-//      // res.sendFile(__dirname + '/success.html');
-//       res.redirect('/success.html');
-//      // console.log(result.affectedRows + " are record inserted");
-//       connection.end();
-//       res.end();
-//   });
-// } else {
-//   res.redirect('/');
-// }
-// });
+       //This line will print the URL in postman body
+      const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+      res.json({ url });
+     // res.json({ message: `User ${username} updated` });
+    }
+  });
+});
 
-// app.put('/users', (req, res) => {
-//  // const id = req.params.id;
-//   const { username, password } = req.body;
-//   const query = 'UPDATE loginusers SET uid1 = ?, pwd = ? WHERE id = ?';
-//   connection.query(query, [username, password], function (err, results, fields) {
-//     if (err) throw err;
-//     res.json({ message: `User with name ${username} updated!` });
-//   });
-// });
+// accepts username and password and deletes the corresponding row from the "loginusers" table. 
+//If the deletion succeeds, it returns a success message.
+app.delete('/user', (req, res) => {
+  const { username, password } = req.body;
+  const query = 'DELETE FROM loginusers WHERE uid1 = ? and pwd = ?';
+  connection.query(query, [username,password], (err, results, fields) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to delete user' });
+    } else { 
+       //This line will print the URL in postman body
+      const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+      //const url = req.protocol + '://' + req.get('host') + req.originalUrl;
+     // pm.response.text(url);
 
-// const registerRouter = require('./register');
-// app.use('/', registerRouter);
+      res.json({ url });
+      // res.json({ message: `Username : ${username} is deleted` });
+    }
+  });
+});
+
 
 
 app.listen(5000, () => console.log('listining on port 5000'));

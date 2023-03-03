@@ -4,7 +4,7 @@ const dbConfig = {
 	user: process.env.MYSQL_USER || 'root',
 	password: process.env.MYSQL_PASSWORD || 'password',
 	database: process.env.MYSQL_DATABASE || 'test',
-    // multipleStatements: true
+    multipleStatements: true
   };
   
   module.exports = dbConfig;

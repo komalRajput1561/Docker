@@ -1,6 +1,7 @@
 CREATE TABLE loginusers(
-	uid1 VARCHAR(60),
-	pwd VARCHAR(60),
+	 id INT AUTO_INCREMENT PRIMARY KEY,
+     uid1 VARCHAR(60) UNIQUE,
+	 pwd VARCHAR(60),
 
   CONSTRAINT contact_name_unique UNIQUE (uid1)    
 );

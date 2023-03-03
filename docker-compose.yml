@@ -5,6 +5,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: test
+    volumes:
+      - db_data:/var/lib/mysql
     restart: always
   web:
     build: ./web
@@ -18,3 +20,6 @@ services:
     depends_on:
       - db
     restart: on-failure
+
+volumes:
+  db_data:
