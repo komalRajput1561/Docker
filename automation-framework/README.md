@@ -1,12 +1,12 @@
 # Dockrizing and Testing a REST API in Node JS with Express using Mocha and Chai
 
 
-## Project setup
+## Docker Build
 ```
-npm install
+sudo docker build -t automation-framework .
 ```
 
-## Run Tests
+## Docker Run
 ```
-npm start
+sudo docker run --rm automation-framework
 ```
