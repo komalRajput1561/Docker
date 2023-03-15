@@ -42,10 +42,25 @@ describe("Mocha test script", () => {
       chai.request(app)
         .get("/logout")
         .end((err, res) => {
+         // res.should.have.status(302);
           res.should.have.status(200);
-         // expect(res).to.redirectTo("http://localhost:3000/");
+         // res.should.redirectTo("http://localhost:3000/");
           done();
         });
     });
-  });
+});
+
+
+  // describe("GET /logout", () => {
+  //   it("should log out the user and redirect to home page", (done) => {
+  //     chai.request(app)
+  //       .get("/logout")
+  //       .end((err, res) => {
+  //         res.should.have.status(200);
+  //        // res.should.redirectTo("http://localhost:3000/");
+  //        // expect(res).to.redirectTo("http://localhost:3000/");
+  //         done();
+  //       });
+  //   });
+  // });
 });

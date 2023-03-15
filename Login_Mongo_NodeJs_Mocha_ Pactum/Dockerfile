@@ -1,4 +1,4 @@
-FROM node:16.14.0
+FROM node:16.0.0
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "test"]
+CMD ["npm", "start"]
 
 
 # FROM node:latest

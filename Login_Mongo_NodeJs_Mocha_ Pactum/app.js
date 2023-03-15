@@ -1,5 +1,3 @@
-// App.js
-
 var express = require("express"),
 	mongoose = require("mongoose"),
 	passport = require("passport"),
@@ -123,7 +121,8 @@ app.post("/login", async function(req, res){
 //Handling user logout
 app.get("/logout", function (req, res) {
 	req.logout(function(err) {
-		if (err) { return next(err); }
+		if (err) { 
+			return next(err); }
 		res.redirect('/');
 	});
 });
