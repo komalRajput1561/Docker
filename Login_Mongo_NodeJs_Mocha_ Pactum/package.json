@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha test",
-    "start": "npx wdio wdio.conf.js"
+    "start": "npx wdio wdio.conf.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,10 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^7.1.2",
-    "wdio-chromedriver-service": "^8.0.0"
+    "selenium-webdriver": "^4.8.1",
+    "wdio-chromedriver-service": "^8.0.0",
+    "webdriver-manager": "^12.1.9",
+    "webdriverio": "^8.6.0"
   },
   "devDependencies": {
     "@wdio/cli": "^8.6.0",

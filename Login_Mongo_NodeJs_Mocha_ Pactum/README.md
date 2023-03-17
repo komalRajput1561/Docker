@@ -53,3 +53,11 @@ sudo docker compose run app npm test --build
 ```sh
 npx wdio wdio.conf.js
 ```
+
+## list of processes using port 3000
+
+```sh
+sudo lsof -i :3000
+kill <PID>
+
+```
